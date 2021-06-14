@@ -31,7 +31,7 @@ const Beranda = (props) =>{
             </div>               
         </div>                      
         <div className="d-flex">
-            <CCard onClick={() => history.push('/hdpsc')} role="button" className="jos" style={{marginRight:'1em', minWidth:'30vw', height:'30vh', backgroundColor:arrWarna[simView-1], color:'white'}}>
+            <CCard onClick={() => history.push('/hdpsc')} role="button" className="jos" style={{marginRight:'1em', minWidth:'30vw', height:'30vh', backgroundColor:arrWarna[simView-1], color:'white', borderRadius:'20px'}}>
                 <CCardBody>
                 <CContainer>
                     <CRow>
@@ -51,7 +51,7 @@ const Beranda = (props) =>{
                     </CContainer>                
                 </CCardBody>
             </CCard>    
-            <CCard onClick={() => history.push('/monitoring')} role="button" className="jos" style={{minWidth:'30vw', height:'30vh', backgroundColor:arrWarna[simView-1], color:'white'}}>
+            <CCard onClick={() => history.push('/monitoring')} role="button" className="jos" style={{minWidth:'30vw', height:'30vh', backgroundColor:arrWarna[simView-1], color:'white', borderRadius:'20px'}}>
                 <CCardBody>
                 <CContainer>
                     <CRow>
