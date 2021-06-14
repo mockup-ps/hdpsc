@@ -1,0 +1,47 @@
+.jos{
+    transition: 0.3s
+}
+.jos:hover{
+    transform: scale(0.95)
+}
+.josss thead tr {
+    background-color: #02265d !important;
+    color:#f5f7fa    
+} 
+.josss th{
+    text-align:center
+}
+.josss td{
+    text-align:center    
+}
+.mantaps th{
+    font-size: xx-small;
+}
+.off {
+    filter : grayscale(100%);
+    transition: 0.3s;
+    opacity: 0.5;
+}
+.on {
+    filter : grayscale(0%);
+    transition: 0.3s;
+    opacity: 1;
+}
+.off:hover{
+    filter : grayscale(0%);
+    transform: scale(1.08);
+    opacity: 1;
+}
+.on:hover{
+    filter : grayscale(0%);
+    transform: scale(1.08);
+    opacity: 1;
+}
+.inputfile {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
