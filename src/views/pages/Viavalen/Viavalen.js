@@ -1,8 +1,8 @@
-import { CCardHeader, CCard, CCardBody, CDataTable, CBadge, CButton, CCollapse, CCol, CRow, CModal, CModalHeader, CModalBody, CModalFooter, CFormGroup, CLabel, CInput } from '@coreui/react'
+import { CCardHeader, CCard, CCardBody, CDataTable, CBadge, CButton, CCollapse, CCol, CRow, CModal, CModalHeader, CModalBody, CModalFooter, CFormGroup, CLabel, CInput, CSelect } from '@coreui/react'
 import {React, useEffect, useState} from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import supabase from '../../../supabase'
-import {ViewAndEdit, ViewOnly, ViewAndCAP, ViewAndMonitor} from './actionComponent'
+import {Edit, ViewOnly, ViewAndCAP, ViewAndMonitor} from './actionComponent'
 import { useHistory } from "react-router-dom";
 import Swal from 'sweetalert2'
 
@@ -32,7 +32,10 @@ const Viavalen = () =>{
                     text: 'Data Detensi tersebut Sudah Pernah Diajukan Sebelumnya'
                   })
             } else {
-                let timerInterval
+                let initial = {}
+                initial.imokapal = field.imokapal
+                initial.tgldetensi = field.tgldetensi
+                dispatch({type:'set', initial: initial})               
                 Swal.fire({
                   icon: 'success',                    
                   title: 'Validasi Sukses',
@@ -96,7 +99,7 @@ const Viavalen = () =>{
             <CModalHeader>
                 <h5>Masukkan Data Awal</h5>
             </CModalHeader>
-            <CModalBody>
+            <CModalBody>               
                 <CRow>
                     <CCol md="12">
                         <CFormGroup>
@@ -177,24 +180,27 @@ const Viavalen = () =>{
                         return(
                             <td>
                                 {
-                                    simView == 1 && item.kd_status == 1 ?
-                                    <ViewOnly/>
-                                    :
-                                    simView == 2 && item.kd_status == 1 ?
-                                    <ViewAndEdit datadetensi={item} />
-                                    :
-                                    simView == 3 && item.kd_status == 2 ?
-                                    <ViewAndEdit datadetensi={item}/>
-                                    :
-                                    simView == 3 && item.kd_status == 3 ?
+                                    (simView == 1 || simView == 2 || simView == 3) && item.kd_status == 3 ?
                                     <ViewAndCAP datadetensi={item}/>
+                                    :                                  
+                                    simView == 1 || simView == 2 || simView == 3 ?
+                                    <Edit datadetensi={item} />
                                     :
-                                    simView == 5 && item.kd_status == 3 ?
-                                    <ViewOnly/>
-                                    :
-                                    simView  !== 3 && item.kd_status == 3 ?
-                                    <ViewAndMonitor datadetensi={item}/>
-                                    :
+                                    // simView == 2 && item.kd_status == 1 ?
+                                    // <ViewAndEdit datadetensi={item} />
+                                    // :
+                                    // simView == 3 && item.kd_status == 2 ?
+                                    // <ViewAndEdit datadetensi={item}/>
+                                    // :
+                                    // simView == 3 && item.kd_status == 3 ?
+                                    // <ViewAndCAP datadetensi={item}/>
+                                    // :
+                                    // simView == 5 && item.kd_status == 3 ?
+                                    // <ViewOnly/>
+                                    // :
+                                    // simView  !== 3 && item.kd_status == 3 ?
+                                    // <ViewAndMonitor datadetensi={item}/>
+                                    // :
                                     <ViewOnly/>
                                 }                                
                             </td>
@@ -218,16 +224,16 @@ const Viavalen = () =>{
                                                 <CBadge color={arrWarna[parseInt(x.kd_status)-1]}>
                                                     {
                                                         x.kd_status == 1 ?
-                                                        "Pemberitahuan oleh Dit. KPLP"
+                                                        "Initial Info"
                                                         :
                                                         x.kd_status == 2 ?
-                                                        "Penerusan Informasi oleh Dit. KAPEL"
+                                                        "Cetakan Form A & B"
                                                         :
                                                         x.kd_status == 3 ?
-                                                        "Input Data oleh BKI"
+                                                        "Data Elektronik Form A & B"
                                                         :
                                                         x.kd_status == 4 ?
-                                                        "Input CAP oleh BKI"
+                                                        "Corrective Action Plan"
                                                         :
                                                         ""
                                                     }                                                    
