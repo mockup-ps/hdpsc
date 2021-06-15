@@ -186,21 +186,6 @@ const Viavalen = () =>{
                                     simView == 1 || simView == 2 || simView == 3 ?
                                     <Edit datadetensi={item} />
                                     :
-                                    // simView == 2 && item.kd_status == 1 ?
-                                    // <ViewAndEdit datadetensi={item} />
-                                    // :
-                                    // simView == 3 && item.kd_status == 2 ?
-                                    // <ViewAndEdit datadetensi={item}/>
-                                    // :
-                                    // simView == 3 && item.kd_status == 3 ?
-                                    // <ViewAndCAP datadetensi={item}/>
-                                    // :
-                                    // simView == 5 && item.kd_status == 3 ?
-                                    // <ViewOnly/>
-                                    // :
-                                    // simView  !== 3 && item.kd_status == 3 ?
-                                    // <ViewAndMonitor datadetensi={item}/>
-                                    // :
                                     <ViewOnly/>
                                 }                                
                             </td>
