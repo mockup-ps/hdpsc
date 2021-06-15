@@ -17,6 +17,7 @@ const EditDetensi = () =>{
     const [dokumen, setDokumen] = useState([])
     const simView = useSelector((state)=>state.simView)
     const forma = useSelector((state)=>state.forma)
+    const [count, setCount] = useState(1)
     const handleChangePage = (e) =>{
         setData(e)
         console.log(e)

@@ -7,7 +7,7 @@ import supabase from '../../../supabase'
 const ViewOnly = () =>{
     return(
         <div className="d-flex flex-row justify-content-center">
-            <div className="mr-2">
+            <div>
                 <CButton className="btn btn-sm btn-success">
                     <i class="fas fa-eye"></i>
                 </CButton>                                 
@@ -193,11 +193,11 @@ const ViewAndCAP = (props) =>{
             </CModalFooter>
         </CModal>
         <div className="d-flex flex-row justify-content-center">
-            <div className="mr-2">
+            {/* <div className="mr-2">
                 <CButton className="btn btn-sm btn-success">
                     <i class="fas fa-eye"></i>
                 </CButton>                                     
-            </div>  
+            </div>   */}
             <div>
                 <CButton onClick={()=>setModal(true)} className="btn btn-sm btn-info">
                     <i class="fas fa-wrench"></i>
@@ -208,7 +208,7 @@ const ViewAndCAP = (props) =>{
     )
 }
 
-const ViewAndEdit = (props) =>{
+const Edit = (props) =>{
     const history = useHistory()
     const dispatch = useDispatch()
     const handleEdit = () =>{
@@ -217,11 +217,11 @@ const ViewAndEdit = (props) =>{
     }     
     return(
         <div className="d-flex flex-row justify-content-center">
-            <div className="mr-2">
+            {/* <div className="mr-2">
                 <CButton className="btn btn-sm btn-success">
                     <i class="fas fa-eye"></i>
                 </CButton>                                     
-            </div>  
+            </div>   */}
             <div>
                 <CButton onClick={()=>handleEdit()} className="btn btn-sm btn-warning">
                     <i class="fas fa-pencil-alt"></i>
@@ -231,4 +231,4 @@ const ViewAndEdit = (props) =>{
     )
 }
 
-export {ViewOnly, ViewAndEdit, ViewAndCAP, ViewAndMonitor}
+export {ViewOnly, Edit, ViewAndCAP, ViewAndMonitor}

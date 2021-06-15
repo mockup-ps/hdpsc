@@ -3,9 +3,12 @@ import {React , useState} from 'react'
 import {ReactComponent as Initial} from '../../../../assets/icons/animate/svg/001-approved.svg'
 import supabase from '../../../../supabase'
 import { useHistory } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux';
 
 const NewDetensi = () =>{
+    const dispatch = useDispatch()
     let history = useHistory()
+    const initial = useSelector((state)=>state.initial)
     const [data, setData] = useState(1)
     const [input, setInput]= useState({})
     const handleChangePage = (e) =>{
@@ -13,27 +16,30 @@ const NewDetensi = () =>{
         console.log(e)
     }
     const handleInputChange= (e) =>{
-        setInput({...input,[e.target.name]:e.target.value})
+        let sementara = {...initial, [e.target.name]:e.target.value}
+        dispatch({type:'set', initial:sementara})
     }
     const handleKirim = async () =>{
-        if(!input.namakapal || !input.imokapal || !input.tgldetensi){
+        if(!initial.namakapal || !initial.imokapal || !initial.tgldetensi){
             alert("Harap Dilengkapi")
         } else {
             const { data, error } = await supabase
             .from('td_detensi')
             .insert([
-                { data: input, kd_status : 1},
+                { data: initial, kd_status : 1},
             ])
             const kirimHistori = await supabase
             .from('th_detensi')
             .insert([
-                { id_detensi: data[0].id_detensi, data: input, kd_status : 1},
+                { id_detensi: data[0].id_detensi, data: initial, kd_status : 1},
             ])
             if (data.error || kirimHistori.error){
                 alert("Error")
             } else {
-                alert("Sukses")
-                history.push('/hdpsc')
+                dispatch({type:'set', initial:{}})
+                let datas = {['id_detensi']:data[0].id_detensi, ...data[0].data, ['kd_status']:data[0].kd_status} 
+                dispatch({type:'set', datadetensi:datas})                               
+                history.push('/hdpsc/edit')
             }
         }
     }
@@ -54,12 +60,12 @@ const NewDetensi = () =>{
                     </div>
                 </div>
                 <CRow>
-                    <CCol md="6">
+                    <CCol md="12">
                         <CRow>
                             <CCol md="12">
                                 <CFormGroup>
                                     <CLabel><b>Nama Kapal</b></CLabel>
-                                    <CInput name="namakapal" value={input.namakapal} onChange={(e)=>handleInputChange(e)} />
+                                    <CInput name="namakapal" value={initial.namakapal} onChange={(e)=>handleInputChange(e)} />
                                 </CFormGroup>                                
                             </CCol>                                
                         </CRow>
@@ -67,7 +73,7 @@ const NewDetensi = () =>{
                             <CCol md="12">
                                 <CFormGroup>
                                     <CLabel><b>Nomor IMO Kapal</b></CLabel>
-                                    <CInput name="imokapal" value={input.imokapal} onChange={(e)=>handleInputChange(e)}/>
+                                    <CInput name="imokapal" value={initial.imokapal} onChange={(e)=>handleInputChange(e)}/>
                                 </CFormGroup>                                
                             </CCol>                                
                         </CRow>  
@@ -75,12 +81,26 @@ const NewDetensi = () =>{
                             <CCol md="12">
                                 <CFormGroup>
                                     <CLabel><b>Tanggal Detensi</b></CLabel>
-                                    <CInput name="tgldetensi" value={input.tgldetensi} onChange={(e)=>handleInputChange(e)} type="date"/>
+                                    <CInput name="tgldetensi" value={initial.tgldetensi} onChange={(e)=>handleInputChange(e)} type="date"/>
                                 </CFormGroup>                                
                             </CCol>                                
-                        </CRow>                        
+                        </CRow>  
+                        <CRow>
+                            <CCol md="12">
+                                <CFormGroup>
+                                    <div className="d-flex justify-content-end">
+                                        <div className="mr-2">
+                                            <CButton onClick={()=>handleKirim()} color="success">Simpan</CButton>
+                                        </div>
+                                        <div className="mr-2">
+                                            <CButton color="danger">Batal</CButton>
+                                        </div>                                
+                                    </div>                                     
+                                </CFormGroup>
+                            </CCol>
+                        </CRow>                      
                     </CCol>
-                    <CCol className="d-flex align-items-center justify-content-center" md="6">
+                    {/* <CCol className="d-flex align-items-center justify-content-center" md="6">
                         <div className="d-flex flex-column">
                             <div className="mb-2">
                                 <input type="checkbox" className="mr-2"/>
@@ -95,7 +115,7 @@ const NewDetensi = () =>{
                                 </div>                                
                             </div>                            
                         </div>
-                    </CCol>
+                    </CCol> */}
                 </CRow>                              
             </CCardBody>
         </CCard>

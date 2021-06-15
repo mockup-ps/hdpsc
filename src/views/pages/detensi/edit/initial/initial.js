@@ -10,7 +10,7 @@ const Initial = (props) => {
     const history = useHistory()
     const handleSimpan = async () =>{
         const simpanBiasa = async () =>{
-            const { data, error } = await supabase
+            const { data:td_detensi, error } = await supabase
             .from('td_detensi')
             .update({ kd_status: 2 })
             .eq('id_detensi', props.datadetensi.id_detensi)
@@ -22,7 +22,9 @@ const Initial = (props) => {
                       { id_detensi: props.datadetensi.id_detensi, kd_status: 2 },
                     ])
                     if(!error){
-                        history.push('/hdpsc')
+                        let sementara = {['id_detensi']:td_detensi[0].id_detensi, ...td_detensi[0].data, ['kd_status']:td_detensi[0].kd_status}
+                        dispatch({type:'set', datadetensi:sementara})
+                        // history.push('/hdpsc')
                     }            
                 }  
                 simpanHistory()               
@@ -128,7 +130,7 @@ const Initial = (props) => {
                                     <CButton onClick={()=>handleSimpan()} color="success">Simpan</CButton>
                                 </div>
                                 <div className="mr-2">
-                                    <CButton color="danger">Batal</CButton>
+                                    <CButton style={{color:'white'}} color="warning">Kembali</CButton>
                                 </div>                        
                             </div>                         
                         </>

@@ -6,7 +6,8 @@ const initialState = {
   datadetensi:{},
   trigger:0,
   forma:{},
-  formb:{}
+  formb:{},
+  initial:{},
 }
 
 const changeState = (state = initialState, { type, ...rest }) => {
