@@ -2,6 +2,7 @@ import {React, useState, useEffect} from 'react'
 import {CDataTable, CButton, CModalHeader, CModal, CModalBody, CFormGroup, CLabel, CInput, CRow, CCol, CSelect, CModalFooter} from '@coreui/react'
 import { useSelector } from 'react-redux'
 import supabase from '../../../../../supabase'
+import AsyncCreatableSelect from 'react-select/async-creatable';
 
 const DataSertifikat = (props) =>{
     const [data, setData] = useState({})
@@ -9,6 +10,9 @@ const DataSertifikat = (props) =>{
     const [item, setItem] = useState([])
     const [modal, setModal] = useState(false)
     const forma = useSelector((state)=>state.forma)
+    const handleChangeField = (e) =>{
+        alert(JSON.stringify(e))
+    }
     const handleChange= (e) =>{
         setData({...data, [e.target.name]:e.target.value})
     }
@@ -39,6 +43,19 @@ const DataSertifikat = (props) =>{
         setItem(sementara)
         console.log(sementara)
       },[trigger]);
+      const searchDataCertificate  = async (inputValue) =>{
+        let sementara = '%'+inputValue+'%'
+        let { data: tr_certificate, error } = await supabase
+        .from('tr_certificate')
+        .select('*')
+        .ilike('ur_certificate', sementara)
+        let dataOptions = tr_certificate.map((x=>{
+            return(
+                {['value']:x.kd_certificate, ['label']:x.ur_certificate}
+            )
+        }))
+        return dataOptions
+    }
     return(
         <>
         <CModal
@@ -53,15 +70,7 @@ const DataSertifikat = (props) =>{
                     <CCol md="12">
                         <CFormGroup>
                             <CLabel>Title</CLabel>
-                            <CSelect name="titlesertifikat" value={data.titlesertifikat} onChange={(e)=>handleChange(e)}>
-                                <option value="0">-</option> 
-                                <option value="1">Load Line</option> 
-                                <option value="2">SC</option> 
-                                <option value="3">SE</option> 
-                                <option value="4">SR</option>       
-                                <option value="5">IOPP</option>  
-                                <option value="6">IAPP</option>                           
-                            </CSelect>
+                            <AsyncCreatableSelect onChange={(e)=>handleChangeField(e)} name="title" loadOptions={searchDataCertificate} />
                         </CFormGroup>
                     </CCol>
                 </CRow>

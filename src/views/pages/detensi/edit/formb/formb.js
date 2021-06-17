@@ -1,6 +1,7 @@
-import { CDataTable, CRow, CCol, CButton, CModalHeader, CModalBody, CFormGroup, CLabel, CModal, CInput, CTextarea, CSelect, CModalFooter} from '@coreui/react';
+import { CDataTable, CRow, CCol, CButton, CModalHeader, CModalBody, CFormGroup, CLabel, CModal, CInput, CTextarea, CSelect, CModalFooter, CInputCheckbox} from '@coreui/react';
 import {React, useState, useEffect} from 'react'
 import supabase from '../../../../../supabase'
+import AsyncSelect from 'react-select/async';
 
 const Formb = (props) =>{
     const [url, setURL] = useState()
@@ -10,7 +11,11 @@ const Formb = (props) =>{
     const [trigger, setTrigger] = useState(true)
     const arrResponsible = ["Dit. KPLP", "Dit. KAPEL", "BKI", "Kemenlu"]
     const handleChange= (e) =>{
-        setData({...data, [e.target.name]:e.target.value})
+        if (e.target.name == 'deficiencies'){
+            setData({...data, [e.target.name]:e.target.checked})            
+        } else {
+            setData({...data, [e.target.name]:e.target.value})
+        }
     }
     const handleSimpan  = async () =>{
         const Simpan = await supabase
@@ -46,12 +51,39 @@ const Formb = (props) =>{
         })
         setItem(sementara)
         console.log(sementara)
-    },[trigger]);         
+    },[trigger]);  
+    const searchData  = async (inputValue) =>{
+        let sementara = '%'+inputValue+'%'
+        let { data: tr_defisiensi, error } = await supabase
+        .from('tr_defisiensi')
+        .select('*')
+        .ilike('ur_defisiensi', sementara)
+        let dataOptions = tr_defisiensi.map((x=>{
+            return(
+                {['value']:x.kd_defisiensi, ['label']:x.ur_defisiensi}
+            )
+        }))
+        return dataOptions
+    }     
+    const searchDataAction  = async(inputValue) =>{
+        let sementara = '%'+inputValue+'%'
+        let { data: tr_action, error } = await supabase
+        .from('tr_action')
+        .select('*')
+        .ilike('ur_action', sementara)
+        let dataOptions = tr_action.map((x=>{
+            return(
+                {['value']:x.kd_action, ['label']:x.ur_action}
+            )
+        }))
+        return dataOptions
+    } 
     return(
         <>
         <CModal
         show={modal}
         onClose={()=>setModal(false)}
+        size="lg"
         >
             <CModalHeader>
                 <h5>Tambah Deficiency</h5>
@@ -61,7 +93,7 @@ const Formb = (props) =>{
                     <CCol md="3">
                         <CFormGroup>
                             <CLabel>Code</CLabel>
-                            <CInput name="codedeficiency" value={data.codedeficiency} onChange={(e)=>handleChange(e)} />
+                            <AsyncSelect loadOptions={searchData}/>
                         </CFormGroup>
                     </CCol>
                     <CCol md="9">
@@ -81,30 +113,39 @@ const Formb = (props) =>{
                     <CCol md="6">
                         <CFormGroup>
                             <CLabel>Action Taken</CLabel>
-                            <CSelect name="actiontaken" value={data.actiontaken} onChange={(e)=>handleChange(e)}>
-                                <option value="1">-</option>   
-                                <option value="10">10</option> 
-                                <option value="15">15</option> 
-                                <option value="16">16</option>
-                                <option value="17">17</option>                                
-                            </CSelect>
+                            <AsyncSelect cacheOptions loadOptions={searchDataAction}/>
                         </CFormGroup>
                     </CCol>                    
                 </CRow>
                 <CRow>
-                    <CCol md="12">
+                    <CCol md="6">
+                        <CRow>
+                            <CCol md="5">
+                                <CLabel>Responsible RO ?</CLabel>
+                            </CCol>
+                            <CCol md="7">
+                                <CFormGroup variant="custom-checkbox" inline>
+                                    <CInputCheckbox onChange={(e)=>handleChange(e)} checked={data.deficiencies} custom id="deficiencies" name="deficiencies"/>
+                                    <CLabel variant="custom-checkbox" htmlFor="deficiencies">Yes</CLabel>
+                                </CFormGroup>
+                            </CCol>                    
+                        </CRow>                        
+                    </CCol>
+                </CRow> 
+                <CRow>
+                    <CCol md="6">
                         <CFormGroup>
-                            <CLabel>Responsible RO</CLabel>
-                            <CSelect name="responsiblero" value={data.responsiblero} onChange={(e)=>handleChange(e)}>
-                                <option value="0">-</option>
-                                <option value="1">Dit. KPLP</option>
-                                <option value="2">Dit. KAPEL</option> 
-                                <option value="3">BKI</option>
-                                <option value="4">Kemenlu</option>
-                            </CSelect>
+                            <CLabel>Pilih Sertifikat</CLabel>
+                            <CSelect></CSelect>
                         </CFormGroup>
                     </CCol>
-                </CRow>                                
+                    <CCol md="6">
+                        <CFormGroup>
+                            <CLabel>Issuing Authority</CLabel>
+                            <CInput disabled />
+                        </CFormGroup>
+                    </CCol>                    
+                </CRow>                                              
             </CModalBody>
             <CModalFooter>
                 <div className="d-flex justify-content-end">

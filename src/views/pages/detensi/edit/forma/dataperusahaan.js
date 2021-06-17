@@ -27,6 +27,20 @@ const DataPerusahaan = () =>{
             </CCol>                                 
         </CRow>
         <CRow>
+            <CCol md="6">
+                <CFormGroup>
+                    <CLabel>Owner</CLabel>
+                    <CInput name="owner" value={forma.owner} onChange={(e)=>handleChange(e)}/>
+                </CFormGroup>                    
+            </CCol>
+            <CCol md="6">
+                <CFormGroup>
+                    <CLabel>Operator</CLabel>
+                    <CInput name="operator" value={forma.operator} onChange={(e)=>handleChange(e)}/>
+                </CFormGroup>                
+            </CCol>            
+        </CRow>
+        <CRow>
             <CCol md="12">
                 <CFormGroup>
                     <CLabel>Name of Master</CLabel>

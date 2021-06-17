@@ -3,6 +3,7 @@ import { CCardBody, CCard, CFormGroup, CLabel, CInput, CRow , CCol, CButton, CDa
 import supabase from '../../../../../supabase'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router'
+import { uid } from 'uid';
 
 const Initial = (props) => {
     const trigger = useSelector((state)=>state.trigger)
@@ -34,12 +35,11 @@ const Initial = (props) => {
     }
     const handleUpload = async (e, a) =>{       
         const file = e.target.files[0]
-        const name = e.target.files[0].name
         const namedok = a
         const { data, error } = await supabase
         .storage
         .from('dokumen')
-        .upload(name , file)    
+        .upload(uid(32) , file)    
         if (error){
             alert("Error")
         } else {

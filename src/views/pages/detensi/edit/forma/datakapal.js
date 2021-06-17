@@ -28,15 +28,7 @@ const DataKapal = (props) =>{
             <CCol md="6">
                 <CFormGroup>
                     <CLabel>Otoritas PSC</CLabel>
-                    <CSelect name="otoritaspsc" onChange={(e)=>handlechange(e)} value={forma.otoritaspsc}>
-                        {
-                            negara.map((x)=>{
-                                return(
-                                    <option value={x.kd_negara}>{x.ur_negara}</option>
-                                )
-                            })
-                        }
-                    </CSelect>
+                    <CInput name="otoritaspsc" onChange={(e)=>handlechange(e)} value={forma.otoritaspsc}/>
                 </CFormGroup>                    
             </CCol>                    
         </CRow>
@@ -50,12 +42,13 @@ const DataKapal = (props) =>{
             <CCol md="6">
                 <CFormGroup>
                     <CLabel>Tipe Kapal</CLabel>
-                    <CSelect onChange={(e)=>handlechange(e)} name="tipekapal" value={forma.tipekapal}>
+                    <CInput onChange={(e)=>handlechange(e)} name="tipekapal" value={forma.tipekapal}/>
+                    {/* <CSelect onChange={(e)=>handlechange(e)} name="tipekapal" value={forma.tipekapal}>
                         <option value="1">Gas Carrier</option> 
                         <option value="2">Oil Tanker</option> 
                         <option value="3">Bulk Carrier</option> 
                         <option value="4">General Cargo/Multipurpose</option> 
-                    </CSelect>
+                    </CSelect> */}
                 </CFormGroup>                
             </CCol>                                     
         </CRow>  

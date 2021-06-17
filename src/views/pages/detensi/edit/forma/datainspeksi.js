@@ -41,9 +41,7 @@ const DataInspeksi = () =>{
             <CCol md="6">
                 <CFormGroup>
                     <CLabel>Classification Society</CLabel>
-                    <CSelect onChange={(e)=>handleChange(e)} value={forma.classificationsociety} name="classificationsociety">
-                        <option value="1">LR</option> 
-                    </CSelect>
+                    <CInput onChange={(e)=>handleChange(e)} value={forma.classificationsociety} name="classificationsociety"/>
                 </CFormGroup>                
             </CCol> 
             <CCol md="6">
