@@ -4,8 +4,10 @@ import {ReactComponent as Initial} from '../../../../assets/icons/animate/svg/00
 import supabase from '../../../../supabase'
 import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
+import Swal from 'sweetalert2';
 
 const NewDetensi = () =>{
+    const simView = useSelector((state)=>state.simView)
     const dispatch = useDispatch()
     let history = useHistory()
     const initial = useSelector((state)=>state.initial)
@@ -21,7 +23,10 @@ const NewDetensi = () =>{
     }
     const handleKirim = async () =>{
         if(!initial.namakapal || !initial.imokapal || !initial.tgldetensi){
-            alert("Harap Dilengkapi")
+            Swal.fire({
+                icon:'error',
+                text:'Harap Lengkapi'
+            })
         } else {
             const { data, error } = await supabase
             .from('td_detensi')
@@ -31,15 +36,66 @@ const NewDetensi = () =>{
             const kirimHistori = await supabase
             .from('th_detensi')
             .insert([
-                { id_detensi: data[0].id_detensi, data: initial, kd_status : 1},
+                { id_detensi: data[0].id_detensi, data: initial, kd_status : 1, createdby:simView},
             ])
             if (data.error || kirimHistori.error){
                 alert("Error")
             } else {
                 dispatch({type:'set', initial:{}})
                 let datas = {['id_detensi']:data[0].id_detensi, ...data[0].data, ['kd_status']:data[0].kd_status} 
-                dispatch({type:'set', datadetensi:datas})                               
-                history.push('/hdpsc/edit')
+                dispatch({type:'set', datadetensi:datas}) 
+                Swal.fire({
+                    icon:'success',
+                    title:'Sukses !',
+                    text:'Apakah Anda Ingin Mengupload Cetakan Form A dan Form B ?',
+                    showDenyButton: true,
+                    confirmButtonText: `Ya`,
+                    denyButtonText: `Tidak`,
+                }).then((res)=>{
+                    if (res.isConfirmed) {
+                        const updateLock = async(hehe) =>{
+                            const { data, error } = await supabase
+                            .from('td_detensi')
+                            .update({ 
+                                fl_lock: 1, 
+                                locked_by:simView                          
+                            })
+                            .eq('id_detensi', hehe)
+                            if(error){
+                                return error
+                            } else {
+                                history.push('/hdpsc/edit')
+                            }
+                        }     
+                        // const updateHistori = async (hehe) =>{
+                        //     const { data, error } = await supabase
+                        //     .from('th_detensi')
+                        //     .insert([
+                        //         { id_detensi: hehe, data: initial, kd_status : 5, createdby:simView, locked_by:simView},
+                        //     ])
+                        //     if (error){
+                        //         return error
+                        //     } else {
+                        //         history.push('/hdpsc/edit')
+                        //     }                     
+                        // }
+                        updateLock(data[0].id_detensi)
+                    } else {
+                        const updateLock = async(hehe) =>{
+                            const { data, error } = await supabase
+                            .from('td_detensi')
+                            .update({ fl_lock: 0 })
+                            .eq('id_detensi', hehe)
+                            if(error){
+                                return error
+                            } else {
+                                history.push('/hdpsc')
+                            }
+                        }
+                        updateLock(data[0].id_detensi)
+                    }                 
+                })                            
+                
             }
         }
     }

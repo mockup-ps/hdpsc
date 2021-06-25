@@ -4,10 +4,12 @@ import supabase from '../../../../../supabase'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router'
 import { uid } from 'uid';
+import Swal from 'sweetalert2'
 
 const Initial = (props) => {
     const trigger = useSelector((state)=>state.trigger)
     const dispatch = useDispatch()
+    const simView = useSelector((state)=>state.simView)
     const history = useHistory()
     const handleSimpan = async () =>{
         const simpanBiasa = async () =>{
@@ -20,11 +22,52 @@ const Initial = (props) => {
                     const { data, error } = await supabase
                     .from('th_detensi')
                     .insert([
-                      { id_detensi: props.datadetensi.id_detensi, kd_status: 2 },
+                      { id_detensi: props.datadetensi.id_detensi, kd_status: 2, createdby:simView},
                     ])
                     if(!error){
                         let sementara = {['id_detensi']:td_detensi[0].id_detensi, ...td_detensi[0].data, ['kd_status']:td_detensi[0].kd_status}
                         dispatch({type:'set', datadetensi:sementara})
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sukses',
+                            text:'Apakah Anda Ingin Mengisi data elektronik Form A & Form B ?',
+                            showConfirmButton:true,
+                            showDenyButton:true
+                          }).then((res)=>{
+                              if(res.isConfirmed){
+                                const updateLock = async(hehe) =>{
+                                    const { data, error } = await supabase
+                                    .from('td_detensi')
+                                    .update({ 
+                                        fl_lock: 1, 
+                                        locked_by:simView                          
+                                    })
+                                    .eq('id_detensi', hehe)
+                                    if(error){
+                                        return error
+                                    } else {
+                                        history.push('/hdpsc/edit')
+                                    }
+                                }  
+                                updateLock(props.datadetensi.id_detensi)                                  
+                              } else {
+                                const updateLock = async(hehe) =>{
+                                    const { data, error } = await supabase
+                                    .from('td_detensi')
+                                    .update({ 
+                                        fl_lock: 0, 
+                                        locked_by:simView                          
+                                    })
+                                    .eq('id_detensi', hehe)
+                                    if(error){
+                                        return error
+                                    } else {
+                                        history.push('/hdpsc')
+                                    }
+                                }  
+                                updateLock(props.datadetensi.id_detensi)                                  
+                              }
+                          })                        
                         // history.push('/hdpsc')
                     }            
                 }  
@@ -32,6 +75,34 @@ const Initial = (props) => {
             }
         }
         simpanBiasa()
+    }
+    const handleRelease = async () =>{
+        const { data:td_detensi, error } = await supabase
+        .from('td_detensi')
+        .update({ kd_status: 4 })
+        .eq('id_detensi', props.datadetensi.id_detensi) 
+        if (!error){
+            const kirimHistori = await supabase
+            .from('th_detensi')
+            .insert({ id_detensi: props.datadetensi.id_detensi, kd_status: 4, createdby:simView},)
+            if(!kirimHistori.error){
+                history.push('/hdpsc')                
+            }
+        }       
+    }
+    const handleDelete = async (a) =>{
+        const deleteFile = await supabase
+        .from('td_dokumen')
+        .delete()
+        .eq('id_dokumen', a) 
+        if (!deleteFile.error){
+            Swal.fire({
+                icon: 'success',
+                title: 'Sukses',
+                timer:300
+              })
+            dispatch({type:'set', trigger:trigger+1})
+        }         
     }
     const handleUpload = async (e, a) =>{       
         const file = e.target.files[0]
@@ -51,14 +122,18 @@ const Initial = (props) => {
               { id_detensi: props.datadetensi.id_detensi, kd_dokumen: namedok, url_dokumen : url },
             ])
             if (!uploadFile.error){
-                alert("Sukses")
+                // alert("Sukses")
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sukses',
+                  })
                 dispatch({type:'set', trigger:trigger+1})
             }
         }
     }
     return(
         <CRow>
-            <CCol md="6">
+            <CCol md="6">                  
                 <CRow>
                     <CCol md="12">
                         <CFormGroup>
@@ -85,10 +160,40 @@ const Initial = (props) => {
                 </CRow>                        
             </CCol>
             <CCol md="6">
-                <div style={{height:'100%'}} className="d-flex flex-column">
+                {
+                    props.datadetensi.kd_status == 4 || props.datadetensi.kd_status == 3 ?
+                    <>
+                        <CRow>
+                            <CCol md="12">
+                                <CFormGroup>
+                                    <CLabel><b>Date of Release from Detention</b></CLabel>
+                                    <div className="d-flex flex-row">
+                                        <div style={{width:'50vw'}} className="mr-2">
+                                            <CInput type="date"/>
+                                        </div>
+                                        {
+                                            props.disabled ?
+                                                <div>
+                                                    <CButton disabled={props.disabled2} onClick={()=>handleRelease()} className="btn btn-warning">Simpan</CButton>
+                                                </div>
+                                            :
+                                            <>
+                                            </>                                    
+                                        }
+                                    </div>
+                                    {/* disabled={props.disabled} */}
+                                </CFormGroup>                
+                            </CCol>                
+                        </CRow>                     
+                    </>
+                    :
+                    <>
+                    </>
+                }               
+                <div className="d-flex flex-column mt-3">
                     <div style={{width:'100%'}}>
                         <CDataTable
-                        addTableClasses="josss mt-4"
+                        addTableClasses="josss mt-2"
                         items={[
                             {no:1, namadok:"Form A", kddok:"forma"},
                             {no:2, namadok:"Form B", kddok:"formb"}
@@ -104,9 +209,21 @@ const Initial = (props) => {
                                 const namedok = item.kddok                                
                                 if(props.datadokumen.filter(x=>x.kd_dokumen == item.kddok).length !== 0){
                                     const linkdok = props.datadokumen.filter(x=>x.kd_dokumen == item.kddok)[0].url_dokumen
+                                    const iddok = props.datadokumen.filter(x=>x.kd_dokumen == item.kddok)[0].id_dokumen
                                     return(
                                         <td>
-                                            <a target="_blank" href={linkdok} role="button" className="btn btn-info btn-sm">Download</a>
+                                            <a target="_blank" href={linkdok} role="button" className="btn btn-info btn-sm mr-1"><i class="fas fa-file-download"></i></a>
+                                            {
+                                                props.disabled ?
+                                                <>
+                                                <CButton disabled={props.disabled2} onClick={()=>handleDelete(iddok)} className="btn btn-danger btn-sm">
+                                                    <i class="far fa-trash-alt"></i>
+                                                </CButton>
+                                                </>
+                                                :
+                                                <>
+                                                </>
+                                            }
                                         </td>
                                     )
                                 } else {
@@ -130,7 +247,7 @@ const Initial = (props) => {
                                     <CButton onClick={()=>handleSimpan()} color="success">Simpan</CButton>
                                 </div>
                                 <div className="mr-2">
-                                    <CButton style={{color:'white'}} color="warning">Kembali</CButton>
+                                    <CButton onClick={()=>history.push('/hdpsc')} style={{color:'white'}} color="warning">Kembali</CButton>
                                 </div>                        
                             </div>                         
                         </>

@@ -10,6 +10,7 @@ import DataSertifikat from './datasertifikat'
 import DataAnnual from './dataannual'
 import DataPenerbit from './datapenerbit'
 import { useDispatch, useSelector } from 'react-redux';
+import Swal from 'sweetalert2';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 const Forma = (props) =>{
@@ -41,7 +42,11 @@ const Forma = (props) =>{
         if (error){
             alert(error)
         } else {
-            alert("Sukses")
+            Swal.fire({
+                timer: 500,
+                icon: 'success',
+                title: 'Sukses',
+              })            
         }
     }    
     return(
@@ -88,28 +93,28 @@ const Forma = (props) =>{
                     </CNav>
                     <CTabContent>
                         <CTabPane data-tab="datakapal">
-                            <DataKapal datadetensi={props.datadetensi} datadokumen={props.datadokumen}/>                                                   
+                            <DataKapal disabled={props.disabled} datadetensi={props.datadetensi} datadokumen={props.datadokumen}/>                                                   
                         </CTabPane>
                         <CTabPane data-tab="datainspeksi">
-                            <DataInspeksi datadetensi={props.datadetensi} datadokumen={props.datadokumen}/>
+                            <DataInspeksi disabled={props.disabled} datadetensi={props.datadetensi} datadokumen={props.datadokumen}/>
                         </CTabPane>
                         <CTabPane data-tab="dataperusahaan">
-                            <DataPerusahaan datadetensi={props.datadetensi} datadokumen={props.datadokumen}/>
+                            <DataPerusahaan disabled={props.disabled} datadetensi={props.datadetensi} datadokumen={props.datadokumen}/>
                         </CTabPane>
                         <CTabPane data-tab="sertifikat">
-                            <DataSertifikat datadetensi={props.datadetensi} datadokumen={props.datadokumen}/>
+                            <DataSertifikat disabled={props.disabled} datadetensi={props.datadetensi} datadokumen={props.datadokumen}/>
                         </CTabPane> 
                         <CTabPane data-tab="annualsurvey">
-                            <DataAnnual datadetensi={props.datadetensi} datadokumen={props.datadokumen}/>
+                            <DataAnnual disabled={props.disabled} datadetensi={props.datadetensi} datadokumen={props.datadokumen}/>
                         </CTabPane> 
                         <CTabPane data-tab="penerbit">
-                            <DataPenerbit datadetensi={props.datadetensi} datadokumen={props.datadokumen}/>
+                            <DataPenerbit disabled={props.disabled} datadetensi={props.datadetensi} datadokumen={props.datadokumen}/>
                         </CTabPane>                                                                                              
                     </CTabContent>                    
                 </CTabs>  
                 <div className="d-flex justify-content-end">
                     <div className="mr-3">
-                        <CButton onClick={()=>handleSimpan()} color="success">Simpan</CButton>                        
+                        <CButton disabled={props.disabled} onClick={()=>handleSimpan()} color="success">Simpan</CButton>                        
                     </div>                                   
                 </div>                          
             </CCol>            

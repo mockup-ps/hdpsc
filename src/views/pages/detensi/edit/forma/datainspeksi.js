@@ -2,7 +2,7 @@ import {React, useState} from 'react'
 import {CRow, CCol, CFormGroup, CLabel, CInput, CSelect, CInputCheckbox} from '@coreui/react'
 import { useDispatch, useSelector } from 'react-redux'
 
-const DataInspeksi = () =>{
+const DataInspeksi = (props) =>{
     const dispatch = useDispatch()
     const forma = useSelector((state)=>state.forma)
     const [datacheck, setDatacheck] = useState(false)
@@ -25,31 +25,25 @@ const DataInspeksi = () =>{
             <CCol md="6">
                 <CFormGroup>
                     <CLabel>Tanggal Inspeksi</CLabel>
-                    <CInput onChange={(e)=>handleChange(e)} value={forma.tglinspeksi} name="tglinspeksi" type="date"/>
+                    <CInput disabled={props.disabled} onChange={(e)=>handleChange(e)} value={forma.tglinspeksi} name="tglinspeksi" type="date"/>
                 </CFormGroup>                    
             </CCol>
             <CCol md="6">
                 <CFormGroup>
                     <CLabel>Tempat Inspeksi</CLabel>
-                    <CInput onChange={(e)=>handleChange(e)} value={forma.tempatinspeksi} name="tempatinspeksi"/>
+                    <CInput disabled={props.disabled} onChange={(e)=>handleChange(e)} value={forma.tempatinspeksi} name="tempatinspeksi"/>
                 </CFormGroup>                
             </CCol>                                 
         </CRow>
         <CRow>                                   
         </CRow>
         <CRow>
-            <CCol md="6">
+            <CCol md="12">
                 <CFormGroup>
                     <CLabel>Classification Society</CLabel>
-                    <CInput onChange={(e)=>handleChange(e)} value={forma.classificationsociety} name="classificationsociety"/>
+                    <CInput disabled={props.disabled} onChange={(e)=>handleChange(e)} value={forma.classificationsociety} name="classificationsociety"/>
                 </CFormGroup>                
-            </CCol> 
-            <CCol md="6">
-                <CFormGroup>
-                    <CLabel>Date of Release from Detention</CLabel>
-                    <CInput onChange={(e)=>handleChange(e)} value={forma.dateofrelease} name="dateofrelease" type="date"/>
-                </CFormGroup>                
-            </CCol>                     
+            </CCol>                    
         </CRow>
         <CRow>
             <CCol md="4">
@@ -57,7 +51,7 @@ const DataInspeksi = () =>{
             </CCol>
             <CCol md="3">
                 <CFormGroup variant="custom-checkbox" inline>
-                    <CInputCheckbox onChange={(e)=>handleChange(e)} checked={forma.deficiencies} custom id="deficiencies" name="deficiencies"/>
+                    <CInputCheckbox disabled={props.disabled} onChange={(e)=>handleChange(e)} checked={forma.deficiencies} custom id="deficiencies" name="deficiencies"/>
                     <CLabel variant="custom-checkbox" htmlFor="deficiencies">Yes</CLabel>
                 </CFormGroup>
             </CCol>                    
@@ -68,7 +62,7 @@ const DataInspeksi = () =>{
             </CCol>
             <CCol md="3">
                 <CFormGroup variant="custom-checkbox" inline>
-                    <CInputCheckbox onChange={(e)=>handleChange(e)} checked={forma.shipdetained} custom id="shipdetained" name="shipdetained"/>
+                    <CInputCheckbox disabled={props.disabled} onChange={(e)=>handleChange(e)} checked={forma.shipdetained} custom id="shipdetained" name="shipdetained"/>
                     <CLabel variant="custom-checkbox" htmlFor="shipdetained">Yes</CLabel>
                 </CFormGroup>
             </CCol>                    
@@ -79,7 +73,7 @@ const DataInspeksi = () =>{
             </CCol>
             <CCol md="3">
                 <CFormGroup variant="custom-checkbox" inline>
-                    <CInputCheckbox onChange={(e)=>handleChange(e)} checked={forma.supportdocument} custom id="supportdocument" name="supportdocument"/>
+                    <CInputCheckbox disabled={props.disabled} onChange={(e)=>handleChange(e)} checked={forma.supportdocument} custom id="supportdocument" name="supportdocument"/>
                     <CLabel variant="custom-checkbox" htmlFor="supportdocument">Yes</CLabel>
                 </CFormGroup>
             </CCol>                    
