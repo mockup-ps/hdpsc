@@ -1,6 +1,7 @@
-import { CDataTable, CRow, CCol, CButton, CModalHeader, CModalBody, CFormGroup, CLabel, CModal, CInput, CTextarea, CSelect, CModalFooter} from '@coreui/react';
+import { CDataTable, CRow, CCol, CButton, CModalHeader, CModalBody, CFormGroup, CLabel, CModal, CInput, CTextarea, CSelect, CModalFooter, CInputCheckbox} from '@coreui/react';
 import {React, useState, useEffect} from 'react'
 import supabase from '../../../../../supabase'
+import AsyncSelect from 'react-select/async';
 
 const Formb = (props) =>{
     const [url, setURL] = useState()
@@ -8,9 +9,14 @@ const Formb = (props) =>{
     const [modal, setModal] = useState(false)
     const [item, setItem] = useState([])
     const [trigger, setTrigger] = useState(true)
+    const [triggers, setTriggers] = useState(false)
     const arrResponsible = ["Dit. KPLP", "Dit. KAPEL", "BKI", "Kemenlu"]
     const handleChange= (e) =>{
-        setData({...data, [e.target.name]:e.target.value})
+        if (e.target.name == 'responsiblero'){
+            setData({...data, [e.target.name]:e.target.checked})            
+        } else {
+            setData({...data, [e.target.name]:e.target.value})
+        }
     }
     const handleSimpan  = async () =>{
         const Simpan = await supabase
@@ -22,6 +28,15 @@ const Formb = (props) =>{
         if(Simpan.error){
             alert(Simpan.error)
         } else {
+            setData({
+                'codedeficiency':'',
+                'natureofdeficiency':'',
+                'conventionreference':'',
+                'actiontaken':'',
+                'responsiblero':'',
+                'certificate':'',
+                'issuingauthority':''
+            })
             setTrigger(!trigger)
             setModal(false)
         }
@@ -41,17 +56,68 @@ const Formb = (props) =>{
         .eq('id_detensi', props.datadetensi.id_detensi) 
         let sementara = td_deficiency.map((x)=>{
             return(
-                {...x.data, ['responsiblero']:arrResponsible[x.data.responsiblero - 1]}
+                {...x.data, 
+                    ['codedeficiency']:x.data.codedeficiency.value, ['actiontaken']:x.data.actiontaken.value,
+                    ['issuingauthority']:x.data.issuingauthority
+                }
             )
         })
         setItem(sementara)
-        console.log(sementara)
-    },[trigger]);         
+        console.log(td_deficiency)
+    },[trigger]);      
+    const handleChangeSelect = (e, id) =>{
+        if (id.name == 'codedeficiency'){
+            setData({...data, [id.name]:e, ['natureofdeficiency']:e.label.substring(8,e.label.length)})            
+        } else if (id.name == 'certificate'){
+            setData({...data, [id.name]:e, ['issuingauthority']:e.issuingauthority})            
+        } else {
+            setData({...data, [id.name]:e})
+        }
+    }
+    const searchData  = async (inputValue) =>{
+        let sementara = '%'+inputValue+'%'
+        let { data: tr_defisiensi, error } = await supabase
+        .from('tr_defisiensi')
+        .select('*')
+        .ilike('ur_defisiensi', sementara)
+        let dataOptions = tr_defisiensi.map((x=>{
+            return(
+                {['value']:x.kd_defisiensi, ['label']:x.ur_defisiensi}
+            )
+        }))
+        return dataOptions
+    }    
+    const searchDataCertificate = async (inputValue) =>{
+        let { data: td_sertifikat, error } = await supabase
+        .from('td_sertifikat')
+        .select('*')
+        .eq('id_detensi', props.datadetensi.id_detensi)
+        let dataOptions = td_sertifikat.map((x=>{
+            return(
+                {...x.data.title, ['issuingauthority']:x.data.issuingauthority}
+            )
+        }))
+        return dataOptions        
+    }      
+    const searchDataAction  = async(inputValue) =>{
+        let sementara = '%'+inputValue+'%'
+        let { data: tr_action, error } = await supabase
+        .from('tr_action')
+        .select('*')
+        .ilike('ur_action', sementara)
+        let dataOptions = tr_action.map((x=>{
+            return(
+                {['value']:x.kd_action, ['label']:x.ur_action}
+            )
+        }))
+        return dataOptions
+    } 
     return(
         <>
         <CModal
         show={modal}
         onClose={()=>setModal(false)}
+        size="lg"
         >
             <CModalHeader>
                 <h5>Tambah Deficiency</h5>
@@ -61,7 +127,7 @@ const Formb = (props) =>{
                     <CCol md="3">
                         <CFormGroup>
                             <CLabel>Code</CLabel>
-                            <CInput name="codedeficiency" value={data.codedeficiency} onChange={(e)=>handleChange(e)} />
+                            <AsyncSelect onChange={(e, id)=>handleChangeSelect(e, id)} value={data.codedeficiency} name="codedeficiency" loadOptions={searchData}/>
                         </CFormGroup>
                     </CCol>
                     <CCol md="9">
@@ -81,30 +147,39 @@ const Formb = (props) =>{
                     <CCol md="6">
                         <CFormGroup>
                             <CLabel>Action Taken</CLabel>
-                            <CSelect name="actiontaken" value={data.actiontaken} onChange={(e)=>handleChange(e)}>
-                                <option value="1">-</option>   
-                                <option value="10">10</option> 
-                                <option value="15">15</option> 
-                                <option value="16">16</option>
-                                <option value="17">17</option>                                
-                            </CSelect>
+                            <AsyncSelect cacheOptions defaultOptions onChange={(e,id)=>handleChangeSelect(e, id)} value={data.actiontaken} name="actiontaken" loadOptions={searchDataAction}/>
                         </CFormGroup>
                     </CCol>                    
                 </CRow>
                 <CRow>
-                    <CCol md="12">
+                    <CCol md="6">
+                        <CRow>
+                            <CCol md="5">
+                                <CLabel>Responsible RO ?</CLabel>
+                            </CCol>
+                            <CCol md="7">
+                                <CFormGroup variant="custom-checkbox" inline>
+                                    <CInputCheckbox onChange={(e)=>handleChange(e)} checked={data.responsiblero} custom id="responsiblero" name="responsiblero"/>
+                                    <CLabel variant="custom-checkbox" htmlFor="responsiblero">Yes</CLabel>
+                                </CFormGroup>
+                            </CCol>                    
+                        </CRow>                        
+                    </CCol>
+                </CRow> 
+                <CRow>
+                    <CCol md="6">
                         <CFormGroup>
-                            <CLabel>Responsible RO</CLabel>
-                            <CSelect name="responsiblero" value={data.responsiblero} onChange={(e)=>handleChange(e)}>
-                                <option value="0">-</option>
-                                <option value="1">Dit. KPLP</option>
-                                <option value="2">Dit. KAPEL</option> 
-                                <option value="3">BKI</option>
-                                <option value="4">Kemenlu</option>
-                            </CSelect>
+                            <CLabel>Pilih Sertifikat</CLabel>
+                            <AsyncSelect onChange={(e, id)=>handleChangeSelect(e, id)} value={data.certificate} name="certificate" cacheOptions defaultOptions loadOptions={searchDataCertificate}/>                            
                         </CFormGroup>
                     </CCol>
-                </CRow>                                
+                    <CCol md="6">
+                        <CFormGroup>
+                            <CLabel>Issuing Authority</CLabel>
+                            <CInput value={data.issuingauthority} disabled />
+                        </CFormGroup>
+                    </CCol>                    
+                </CRow>                                              
             </CModalBody>
             <CModalFooter>
                 <div className="d-flex justify-content-end">
@@ -125,7 +200,10 @@ const Formb = (props) =>{
             </CCol>
             <CCol md="6">
                 <div className="d-flex justify-content-end mb-2">
-                    <CButton onClick={()=>setModal(true)} className="btn btn-sm btn-info">Tambah</CButton>
+                    <CButton onClick={()=>{
+                        setModal(true)
+                        setTriggers(!triggers)
+                    }} className="btn btn-sm btn-info" disabled={props.disabled}>Tambah</CButton>
                 </div>
                 <CDataTable
                 addTableClasses="josss mantaps"
@@ -137,9 +215,23 @@ const Formb = (props) =>{
                     {key:"conventionreference", label:"Convention Reference"},
                     {key:"actiontaken", label:"Action Taken"},
                     {key:"responsiblero", label:"Responsible RO"},
+                    {key:"issuingauthority", label:"Issuing Authority"},
                     {key:"action", label:"Action"},
                 ]}
                 scopedSlots={{
+                    'responsiblero':
+                    (item, index)=>{
+                        return(
+                            <td>
+                                {
+                                    item.responsiblero ?
+                                    "Yes"
+                                    :
+                                    "No"
+                                }
+                            </td>
+                        )
+                    },
                     'no':
                     (item, index)=>{
                         return(
@@ -154,10 +246,10 @@ const Formb = (props) =>{
                             <td>
                                 <div className="d-flex justify-content-center">
                                     <div className="mr-2">
-                                        <CButton className="btn btn-info btn-sm">Edit</CButton>
+                                        <CButton disabled={props.disabled} className="btn btn-info btn-sm">Edit</CButton>
                                     </div>
                                     <div className="mr-2">
-                                        <CButton className="btn btn-danger btn-sm">Hapus</CButton>
+                                        <CButton disabled={props.disabled} className="btn btn-danger btn-sm">Hapus</CButton>
                                     </div>                                    
                                 </div>
                             </td>

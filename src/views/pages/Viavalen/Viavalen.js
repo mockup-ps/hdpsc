@@ -8,10 +8,11 @@ import Swal from 'sweetalert2'
 
 const Viavalen = () =>{
     const dispatch = useDispatch()
+    const arrView = ["Direktorat KPLP", "Direktorat KAPEL", "BKI","Kemenlu", "Kemenkomarves"] 
     let history = useHistory()
     const [data, setData] = useState([])
     const [details, setDetails] = useState([])
-    const arrWarna = ["success","primary","warning","info"]
+    const arrWarna = ["success","primary","warning","info", "danger", "light"]
     const [modal, setModal] = useState(false)
     const simView = useSelector((state)=>state.simView)
     const [field, setField] = useState({})
@@ -66,13 +67,17 @@ const Viavalen = () =>{
         .select(`
             id_detensi,
             data,
+            fl_lock,
+            locked_by,
             tr_status (
                 kd_status,
                 ur_status
             ),
             th_detensi (
                 kd_status,
-                created_at
+                created_at,
+                createdby,
+                locked_by
             )
         `)          
         const urstatus = await supabase
@@ -83,11 +88,11 @@ const Viavalen = () =>{
         `)         
         let datas = detensi.data.map(x=>{
             return(
-                {['id_detensi']:x.id_detensi, ...x.data, ...x.tr_status, ['histori']:x.th_detensi}
+                {['id_detensi']:x.id_detensi, ...x.data, ...x.tr_status, ['histori']:x.th_detensi, ['locked_by']:x.locked_by, ['fl_lock']:x.fl_lock}
             )
         })
         setData(datas)   
-        console.log(urstatus) 
+        console.log(urstatus)
       },[]);      
     return(
         <>
@@ -153,10 +158,31 @@ const Viavalen = () =>{
                     { key: 'namakapal', label: 'Nama Kapal' },
                     { key: 'imokapal', label: 'Nomor IMO Kapal' },
                     { key: 'tgldetensi', label: 'Tanggal Detensi' },
-                    { key: 'status', label: 'Status' },                    
+                    { key: 'status', label: 'Status' }, 
+                    { key: 'lock', label: 'Available ?', _style: { width: '15%'}},                    
                     { key: 'action', label: 'Action' }                                        
                 ]}
                 scopedSlots={{
+                    'lock':
+                    (item, index) =>{
+                    let locked
+                    let locker 
+                    if (item.locked_by == simView){
+                        locker="Me"
+                    } else {
+                        locker=arrView[item.locked_by-1]
+                    }
+                    if(item.fl_lock){
+                        locked = "Checked Out by "+locker
+                    } else {
+                        locked = "Available"
+                    }
+                    return(
+                        <td>
+                            {locked}
+                        </td>
+                    )
+                    },
                     'no':
                     (item, index)=>{
                         return(
@@ -177,14 +203,30 @@ const Viavalen = () =>{
                     },
                     'action':
                     (item, index) =>{
+                        console.log(item)
+                        console.log()
+                        let locker = arrView[item.locked_by-1]
+                        let locked
+                        if (item.fl_lock){
+                            if (item.locked_by == simView){
+                                locked = false
+                            } else {
+                                locked = true
+                            }
+                        } else {
+                            locked = false
+                        }
                         return(
                             <td>
                                 {
                                     (simView == 1 || simView == 2 || simView == 3) && item.kd_status == 3 ?
-                                    <ViewAndCAP datadetensi={item}/>
+                                    <ViewAndCAP datadetensi={item} datadetensi={item}/>
                                     :                                  
-                                    simView == 1 || simView == 2 || simView == 3 ?
-                                    <Edit datadetensi={item} />
+                                    (simView == 1 || simView == 2 || simView == 3) && item.kd_status != 4 ?
+                                    <Edit  fl_lock={item.fl_lock} locker={locker} disabled={locked} datadetensi={item} />
+                                    :
+                                    (simView == 1 || simView == 2 || simView == 3) && item.kd_status == 4 ?
+                                    <ViewAndCAP datadetensi={item} datadetensi={item}/>
                                     :
                                     <ViewOnly/>
                                 }                                
@@ -193,6 +235,7 @@ const Viavalen = () =>{
                     },
                     'details':
                     (item, index) =>{
+                        console.log(item)
                         return(
                             <CCollapse show={details.includes(index)}>
                                 {item.histori.map(x=>{
@@ -218,7 +261,7 @@ const Viavalen = () =>{
                                                         "Data Elektronik Form A & B"
                                                         :
                                                         x.kd_status == 4 ?
-                                                        "Corrective Action Plan"
+                                                        "Input Tanggal Release"
                                                         :
                                                         ""
                                                     }                                                    
@@ -226,7 +269,10 @@ const Viavalen = () =>{
                                             </div>
                                             <div style={{minWidth:"15vw"}} className="d-flex flex-column">
                                                 {hari.toString().length == 1 ? "0"+hari : hari}-{bulan.toString().length == 1 ? "0"+bulan : bulan}-{tahun}{' '}{jam}:{menit}:{detik}
-                                            </div>                                    
+                                            </div> 
+                                            <div style={{minWidth:"15vw"}} className="d-flex flex-column">
+                                                {arrView[parseInt(x.createdby)-1]}
+                                            </div>                                                                                
                                         </div>                                        
                                     )
                                 })}

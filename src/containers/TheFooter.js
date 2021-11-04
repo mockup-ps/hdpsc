@@ -6,7 +6,7 @@ const TheFooter = () => {
     <CFooter fixed={false}>
       <div>
         <a rel="noopener noreferrer">Mockup Helpdesk PSC</a>
-        <span className="ml-1">per 10/06/2021</span>
+        <span className="ml-1">per 24/06/2021</span>
       </div>
       <div className="mfs-auto">
         <span className="mr-1">Lembaga National Single Window</span>

@@ -84,7 +84,7 @@ const DataAnnual = (props) =>{
         </CModal>
         <div className="mt-3">
             <div className="d-flex justify-content-end mb-2">
-                <CButton onClick={()=>setModal(true)} className="btn btn-sm btn-info">Tambah</CButton>
+                <CButton disabled={props.disabled} onClick={()=>setModal(true)} className="btn btn-sm btn-info">Tambah</CButton>
             </div>
             <CDataTable
             addTableClasses="josss"
@@ -111,10 +111,10 @@ const DataAnnual = (props) =>{
                         <td>
                             <div className="d-flex justify-content-center">
                                 <div className="mr-2">
-                                    <CButton className="btn btn-sm btn-success">Simpan</CButton>
+                                    <CButton disabled={props.disabled} className="btn btn-sm btn-success">Simpan</CButton>
                                 </div>
                                 <div className="mr-2">
-                                    <CButton className="btn btn-sm btn-danger">Batal</CButton>
+                                    <CButton disabled={props.disabled} className="btn btn-sm btn-danger">Batal</CButton>
                                 </div>                                
                             </div>
                         </td>
